@@ -48,21 +48,18 @@ pub fn build(b: *std.Build) void {
             .target = target,
             .optimize = optimize,
         })) |dep| {
-            lib.installLibraryHeaders(dep.artifact("vulkan-headers"));
+            lib.root_module.addIncludePath(dep.path("include"));
         }
         if (target.result.os.tag == .linux) {
             if (b.lazyDependency("x11_headers", .{
                 .target = target,
                 .optimize = optimize,
             })) |dep| {
-                lib.root_module.linkLibrary(dep.artifact("x11-headers"));
-                lib.installLibraryHeaders(dep.artifact("x11-headers"));
+                lib.root_module.addSystemIncludePath(dep.path(""));
             }
             if (b.lazyDependency("wayland_headers", .{})) |dep| {
-                lib.root_module.addIncludePath(dep.path("wayland"));
-                lib.root_module.addIncludePath(dep.path("wayland-protocols"));
-                lib.installHeadersDirectory(dep.path("wayland"), ".", .{});
-                lib.installHeadersDirectory(dep.path("wayland-protocols"), ".", .{});
+                lib.root_module.addSystemIncludePath(dep.path("wayland"));
+                lib.root_module.addSystemIncludePath(dep.path("wayland-protocols"));
             }
         }
 
